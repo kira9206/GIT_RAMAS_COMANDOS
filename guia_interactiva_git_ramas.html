@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Guía interactiva de Git: ramas, merge, stash, conflictos, rebase, cherry-pick y ejercicios.">
+<title>Git · Gestión de ramas | Guía interactiva</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2d;--panel2:#18233a;--text:#e8edf7;--muted:#a8b4ca;--line:#2b3954;--accent:#70a5ff;--accent2:#7ce0bd;--warn:#ffcc80;--danger:#ff8f9a;--radius:16px;--shadow:0 14px 38px #0004}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 80% 0%,#1a2c50 0,transparent 32rem),var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+a{color:var(--accent)}button,input{font:inherit}.wrap{max-width:1200px;margin:auto;padding:24px}
+header{padding:46px 0 28px}.eyebrow{color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.13em;font-size:.78rem}
+h1{font-size:clamp(2.2rem,5vw,4rem);line-height:1.08;margin:.45rem 0 1rem;letter-spacing:-.04em}h2{font-size:1.8rem;margin:0 0 14px}h3{font-size:1.2rem;margin:0 0 8px}p{margin:.45rem 0 1rem;color:#d4dced}.lead{max-width:780px;color:var(--muted);font-size:1.12rem}
+.hero-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:18px;align-items:stretch}.hero-card,.card{background:linear-gradient(145deg,#17233a,#111a2b);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero-card{padding:24px}.hero-side{padding:22px;display:flex;flex-direction:column;justify-content:center;gap:12px}.stat{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:9px 0;color:var(--muted)}.stat strong{color:var(--text)}
+nav{position:sticky;top:0;z-index:10;background:#0b1020eF;backdrop-filter:blur(12px);border-block:1px solid var(--line)}
+.navinner{max-width:1200px;margin:auto;padding:10px 24px;display:flex;gap:8px;overflow:auto}nav a{white-space:nowrap;text-decoration:none;color:var(--muted);padding:7px 12px;border-radius:99px;font-size:.9rem}nav a:hover{background:var(--panel2);color:white}
+section{padding:42px 0;scroll-margin-top:72px}.section-head{display:flex;gap:12px;align-items:end;justify-content:space-between;margin-bottom:18px}.section-head p{color:var(--muted);margin:0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.card{padding:20px}.topic{scroll-margin-top:90px}.topic-num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#20375e;color:#a9c8ff;font-weight:800;margin-right:8px}
+.tag{display:inline-block;border:1px solid #3b5278;border-radius:99px;padding:2px 9px;color:#bcd2ff;font-size:.78rem;margin:2px 4px 2px 0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#b8e8d5;background:#0a1424;padding:2px 6px;border-radius:6px;font-size:.92em}
+pre{position:relative;margin:12px 0 16px;padding:16px;background:#080e19;border:1px solid #263650;border-radius:12px;overflow:auto;color:#d9e7ff;font: .9rem/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}
+pre code{padding:0;background:none;color:inherit}.copy{position:absolute;right:9px;top:9px;border:1px solid #3a4c69;background:#17243a;color:#dce8ff;border-radius:8px;padding:5px 9px;cursor:pointer;font-size:.78rem}.copy:hover{background:#263b5d}
+.callout{padding:13px 15px;border-left:3px solid var(--accent);background:#14223a;border-radius:8px;color:#d8e5fa;margin:12px 0}.warning{border-left-color:var(--warn);background:#302718}.danger{border-left-color:var(--danger);background:#301c29}
+.diagram{padding:14px;background:#0b1424;border:1px dashed #405574;border-radius:12px;overflow:auto;color:#c9dcff;font: .9rem/1.7 ui-monospace,monospace;white-space:pre}
+table{width:100%;border-collapse:collapse;margin:12px 0}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:#bcd2ff;background:#17243a}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}.search{flex:1;min-width:220px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:#0c1525;color:var(--text)}
+.btn{border:1px solid #45618d;background:#20385e;color:#eff5ff;border-radius:10px;padding:9px 14px;cursor:pointer;font-weight:650}.btn:hover{filter:brightness(1.18)}.btn.secondary{background:#172235;border-color:var(--line)}.btn.green{background:#174b42;border-color:#327b69}
+.command-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.command{padding:12px;border:1px solid var(--line);background:#0e1829;border-radius:10px}.command small{display:block;color:var(--muted);margin-top:5px}
+.quiz-q{padding:17px;border:1px solid var(--line);border-radius:12px;margin:14px 0;background:#101a2c}.quiz-q label{display:block;padding:7px 9px;border-radius:8px;cursor:pointer;color:#d8e1f0}.quiz-q label:hover{background:#1b2b45}.feedback{padding:10px;border-radius:8px;margin-top:8px;background:#17263c}.correct{color:var(--accent2)}.incorrect{color:var(--danger)}
+.progress{height:9px;background:#26334a;border-radius:20px;overflow:hidden}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#70a5ff,#7ce0bd);transition:width .25s}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);text-align:center}
+.hidden{display:none!important}.muted{color:var(--muted)}.pill{font-size:.78rem;color:#a9c8ff;background:#1b3152;padding:4px 9px;border-radius:99px}
+@media(max-width:760px){.wrap{padding:16px}.hero-grid,.grid,.command-list{grid-template-columns:1fr}.section-head{display:block}.hero-side{display:grid;grid-template-columns:1fr 1fr}.hero-side h3{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header class="wrap" id="inicio">
+  <div class="eyebrow">Guía práctica · Git y GitHub</div>
+  <h1>Gestión de ramas<br><span style="color:var(--accent)">de cero a práctico</span></h1>
+  <p class="lead">Aprende los 15 temas de gestión de ramas con explicaciones sencillas, diagramas, ejemplos que puedes copiar, una referencia de comandos y un test autocorregible.</p>
+  <div class="hero-grid">
+    <div class="hero-card">
+      <span class="pill">Ruta de aprendizaje</span>
+      <h2 style="margin-top:12px">Trabaja sin romper <code>main</code></h2>
+      <p>Una rama permite desarrollar una funcionalidad de forma independiente. Cuando está lista, puedes comparar, integrar, seleccionar o revertir cambios.</p>
+      <div class="diagram">main:             A──B──C
+                       \
+feature/carrito:        D──E──F</div>
+      <p class="muted">Ejemplo conceptual: la rama feature/carrito parte de main y contiene sus propios commits.</p>
+    </div>
+    <div class="hero-card hero-side">
+      <h3>Contenido de la guía</h3>
+      <div class="stat"><span>Temas explicados</span><strong>15</strong></div>
+      <div class="stat"><span>Comandos de referencia</span><strong>50+</strong></div>
+      <div class="stat"><span>Preguntas del test</span><strong>10</strong></div>
+      <div class="stat"><span>Progreso del test</span><strong id="heroScore">0 / 10</strong></div>
+    </div>
+  </div>
+</header>
+<nav><div class="navinner">
+<a href="#fundamentos">Fundamentos</a><a href="#temas">15 temas</a><a href="#flujo">Práctica</a><a href="#comandos">Comandos</a><a href="#comparacion">Comparaciones</a><a href="#test">Test</a>
+</div></nav>
+<main class="wrap">
+<section id="fundamentos">
+  <div class="section-head"><div><div class="eyebrow">Antes de comenzar</div><h2>Conceptos fundamentales</h2></div></div>
+  <div class="grid">
+    <article class="card"><h3>¿Qué es un commit?</h3><p>Es una captura de los cambios que confirmas en el historial del repositorio. Cada commit tiene un identificador (hash), autor, fecha y mensaje.</p><pre><code>git add .
+git commit -m "Crear página de inicio"</code></pre></article>
+    <article class="card"><h3>¿Qué es una rama?</h3><p>Es una referencia móvil a un commit. Permite trabajar en una línea de desarrollo independiente sin modificar directamente otra rama.</p><pre><code>git branch
+git switch -c feature/login</code></pre></article>
+    <article class="card"><h3>¿Qué es HEAD?</h3><p>Es la referencia que indica dónde estás trabajando actualmente (normalmente el último commit de la rama activa).</p><pre><code>git status
+git log --oneline --decorate -5</code></pre></article>
+    <article class="card"><h3>¿Qué es origin?</h3><p>Es el nombre remoto que suele asignarse al repositorio alojado en GitHub, GitLab u otro servidor.</p><pre><code>git remote -v
+git fetch origin</code></pre></article>
+  </div>
+  <div class="callout"><strong>Regla útil:</strong> antes de ejecutar operaciones que cambien el historial, revisa <code>git status</code> y asegúrate de entender en qué rama estás.</div>
+</section>
+
+<section id="temas">
+  <div class="section-head"><div><div class="eyebrow">Lecciones</div><h2>Los 15 temas de gestión de ramas</h2></div><span class="pill">Explicación + ejemplo</span></div>
+  <div class="toolbar"><input class="search" id="topicSearch" placeholder="Buscar un tema o comando..."><button class="btn secondary" id="expandAll">Expandir todo</button><button class="btn secondary" id="collapseAll">Contraer todo</button></div>
+  <div id="topicContainer">
+  <details class="card topic" open data-search="introducción ramas branch"><summary><span class="topic-num">01</span><strong>Introducción a las ramas</strong></summary>
+    <p>Las ramas permiten desarrollar funcionalidades, corregir errores o experimentar sin alterar directamente la versión principal del proyecto.</p>
+    <p><strong>Ejemplo:</strong> tienes una tienda web en <code>main</code> y vas a desarrollar un carrito de compras.</p>
+    <pre><code>git switch -c feature/carrito</code></pre>
+    <p>El comando crea la rama y cambia a ella. Luego puedes trabajar y confirmar tus avances con commits.</p>
+  </details>
+  <details class="card topic" data-search="qué son ramas branch commit"><summary><span class="topic-num">02</span><strong>¿Qué son las ramas?</strong></summary>
+    <p>Una rama es una referencia a un commit. Al crear una rama, Git no duplica todo el proyecto: crea una nueva referencia desde el commit actual.</p>
+    <div class="diagram">Antes:
+A──B──C  main
+
+Después de crear feature/login:
+A──B──C  main
+       └─ feature/login</div>
+    <pre><code>git branch feature/login
+git switch feature/login
+# Atajo: crear y cambiar
+git switch -c feature/registro</code></pre>
+  </details>
+  <details class="card topic" data-search="gestionar crear cambiar renombrar eliminar ramas"><summary><span class="topic-num">03</span><strong>Gestionando ramas</strong></summary>
+    <p>Permite listar, crear, cambiar, renombrar y eliminar ramas locales o consultar ramas remotas.</p>
+    <pre><code># Listar ramas locales
+git branch
+
+# Listar ramas locales y remotas
+git branch -a
+
+# Crear y cambiar
+git switch -c feature/perfil
+
+# Renombrar la rama actual
+git branch -m feature/perfil-usuario
+
+# Eliminar una rama ya integrada
+git branch -d feature/perfil-usuario
+
+# Forzar eliminación local
+git branch -D feature/experimento</code></pre>
+    <div class="callout warning"><strong>Atención:</strong> <code>-D</code> fuerza la eliminación aunque la rama no esté integrada. Podrías perder commits que no estén en otra referencia.</div>
+  </details>
+  <details class="card topic" data-search="comparar diferencias diff ramas"><summary><span class="topic-num">04</span><strong>Comparando ramas</strong></summary>
+    <p>Compara archivos o commits para saber qué cambiará antes de integrar una rama.</p>
+    <pre><code># Diferencias de contenido
+git diff main..feature/carrito
+
+# Resumen de archivos cambiados
+git diff --stat main..feature/carrito
+
+# Commits que están en feature y no en main
+git log --oneline main..feature/carrito
+
+# Historial gráfico de todas las ramas
+git log --oneline --graph --all</code></pre>
+    <p><strong>Ejemplo:</strong> antes de integrar el carrito, revisas qué archivos modificó la rama.</p>
+  </details>
+  <details class="card topic" data-search="stash guardar temporal cambios recuperar pop apply"><summary><span class="topic-num">05</span><strong>Stash</strong></summary>
+    <p>Guarda temporalmente cambios no confirmados para que puedas cambiar de rama o atender otra tarea. Por defecto guarda cambios rastreados; para incluir archivos nuevos no rastreados utiliza <code>-u</code>.</p>
+    <pre><code># Guardar cambios
+git stash push -m "Trabajo pendiente del carrito"
+
+# Incluir archivos nuevos no rastreados
+git stash push -u -m "Carrito con archivos nuevos"
+
+# Ver la lista
+git stash list
+
+# Recuperar y quitar de la lista si se aplica bien
+git stash pop
+
+# Recuperar sin quitar de la lista
+git stash apply
+
+# Eliminar una entrada
+git stash drop stash@{0}
+
+# Borrar todos los stash
+git stash clear</code></pre>
+    <div class="callout"><strong>Pop vs apply:</strong> <code>pop</code> intenta aplicar y después elimina la entrada; <code>apply</code> aplica y la conserva.</div>
+  </details>
+  <details class="card topic" data-search="tipos merge integración ramas"><summary><span class="topic-num">06</span><strong>Tipos de merge</strong></summary>
+    <p><code>merge</code> integra los cambios de otra rama en la rama actual. Los escenarios comunes son fast-forward y three-way. También puedes usar <code>--no-ff</code> para forzar un commit de merge o <code>--squash</code> para preparar un único commit con los cambios.</p>
+    <pre><code>git switch main
+git merge feature/login
+
+# Crear commit de merge aunque sea posible avanzar
+git merge --no-ff feature/login
+
+# Preparar los cambios como squash
+git merge --squash feature/login</code></pre>
+  </details>
+  <details class="card topic" data-search="fast forward ff merge avance rápido"><summary><span class="topic-num">07</span><strong>Fast-forward merge</strong></summary>
+    <p>Ocurre cuando la rama destino no tiene commits nuevos divergentes desde el punto donde nació la rama de trabajo. Git puede mover el puntero hacia adelante sin crear un commit de merge.</p>
+    <div class="diagram">Antes:
+A──B──C  main
+       └──D──E  feature
+
+Después:
+A──B──C──D──E  main, feature</div>
+    <pre><code>git switch main
+git merge --ff-only feature</code></pre>
+    <p><code>--ff-only</code> exige fast-forward y falla si no es posible.</p>
+  </details>
+  <details class="card topic" data-search="three way merge tres vías base común"><summary><span class="topic-num">08</span><strong>Three-way merge (tres vías)</strong></summary>
+    <p>Se utiliza cuando ambas ramas avanzaron desde un ancestro común. Git compara la base común, la punta de la rama actual y la punta de la rama que quieres integrar. Si puede combinar los cambios, crea un commit de merge.</p>
+    <div class="diagram">       C──D  main
+      /
+A──B
+      \
+       E──F  feature
+
+Después del merge:
+       C──D────M  main
+      /       /
+A──B        /
+      \    /
+       E──F</div>
+    <pre><code>git switch main
+git merge feature</code></pre>
+  </details>
+  <details class="card topic" data-search="conflictos merge conflict resolver"><summary><span class="topic-num">09</span><strong>Conflictos</strong></summary>
+    <p>Un conflicto aparece cuando Git no puede combinar automáticamente cambios, por ejemplo, cuando dos ramas modifican la misma zona de un archivo.</p>
+    <pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+const precio = 100;
+=======
+const precio = 150;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/carrito</code></pre>
+    <p>Edita el archivo y deja el resultado correcto, quitando las marcas. Después:</p>
+    <pre><code>git status
+git add carrito.js
+git commit</code></pre>
+    <p>Si quieres cancelar el merge que está en curso: <code>git merge --abort</code>.</p>
+  </details>
+  <details class="card topic" data-search="conflictos vscode visual studio code accept current incoming both"><summary><span class="topic-num">10</span><strong>Conflictos en VS Code</strong></summary>
+    <p>VS Code muestra acciones para resolver conflictos desde el editor.</p>
+    <table><tr><th>Acción</th><th>Qué hace</th></tr>
+      <tr><td>Accept Current Change</td><td>Conserva el bloque de la rama actual (HEAD).</td></tr>
+      <tr><td>Accept Incoming Change</td><td>Conserva el bloque que llega de la otra rama.</td></tr>
+      <tr><td>Accept Both Changes</td><td>Incluye ambos bloques; revisa el orden y posibles duplicados.</td></tr>
+      <tr><td>Compare Changes</td><td>Ayuda a comparar las versiones.</td></tr></table>
+    <p>Después de resolver y revisar el archivo, márcalo como resuelto:</p>
+    <pre><code>git add archivo.js
+git status
+git commit</code></pre>
+  </details>
+  <details class="card topic" data-search="revertir commit revert deshacer seguro"><summary><span class="topic-num">11</span><strong>Revertir un commit</strong></summary>
+    <p><code>git revert</code> crea un nuevo commit que aplica el inverso de los cambios de otro commit. Es útil para deshacer cambios ya compartidos sin reescribir el historial.</p>
+    <pre><code># Busca el hash
+git log --oneline
+
+# Revierte el commit indicado
+git revert a1b2c3d
+
+# No abrir editor para el mensaje
+git revert --no-edit a1b2c3d</code></pre>
+    <div class="callout warning">Para revertir un commit de merge se necesita indicar el padre principal, por ejemplo <code>git revert -m 1 HASH</code>. Confirma cuál padre debe conservarse antes de ejecutarlo.</div>
+  </details>
+  <details class="card topic" data-search="archivos de otras ramas restore show checkout"><summary><span class="topic-num">12</span><strong>Archivos de otras ramas</strong></summary>
+    <p>Puedes recuperar un archivo concreto de otra rama sin fusionar toda esa rama. El archivo se copia al directorio de trabajo y queda pendiente de confirmar.</p>
+    <pre><code># Traer un archivo desde otra rama
+git restore --source feature/carrito -- carrito.js
+
+# Inspeccionar el contenido sin extraerlo
+git show feature/carrito:carrito.js
+
+# Luego revisar y confirmar
+git diff
+git add carrito.js
+git commit -m "Recuperar carrito.js"</code></pre>
+  </details>
+  <details class="card topic" data-search="cherry pick commit específico seleccionar"><summary><span class="topic-num">13</span><strong>Cherry-pick</strong></summary>
+    <p>Aplica en la rama actual los cambios introducidos por uno o varios commits concretos de otra rama. Crea un commit nuevo con un hash distinto.</p>
+    <div class="diagram">main:       A──B
+feature:    A──B──C──D──E
+                  ↑
+          seleccionar D
+
+main después: A──B──D'</div>
+    <pre><code>git log --oneline feature/login
+git switch main
+git cherry-pick HASH_DEL_COMMIT
+
+# Si hay conflicto:
+# resolver archivos y hacer git add
+git cherry-pick --continue
+
+# Cancelar la operación
+git cherry-pick --abort</code></pre>
+  </details>
+  <details class="card topic" data-search="rebase historial reorganizar commits"><summary><span class="topic-num">14</span><strong>Rebase</strong></summary>
+    <p>Vuelve a aplicar los commits de tu rama sobre una base nueva. Puede dejar un historial más lineal, pero los commits reaplicados reciben nuevos hashes.</p>
+    <div class="diagram">Antes:
+       C──D  main
+      /
+A──B
+      \
+       E──F  feature
+
+git switch feature
+git rebase main
+
+Después:
+A──B──C──D  main
+          \
+           E'──F'  feature</div>
+    <pre><code>git switch feature/login
+git rebase main
+
+# Resolver conflictos, luego:
+git add archivo.js
+git rebase --continue
+
+# Cancelar y volver al estado anterior
+git rebase --abort
+
+# Reordenar/editar los últimos 3 commits
+git rebase -i HEAD~3</code></pre>
+    <div class="callout warning">Evita reescribir con rebase commits que otras personas ya usan, salvo que el equipo coordine esa operación.</div>
+  </details>
+  <details class="card topic" data-search="squash merge agrupar commits uno"><summary><span class="topic-num">15</span><strong>Squash merge</strong></summary>
+    <p>Combina el efecto de los cambios de una rama en el índice de la rama actual, para que puedas crear un solo commit. Los commits originales no se incorporan individualmente al historial de la rama destino.</p>
+    <div class="diagram">feature: A──B──C──D──E
+
+main:    A──B──S
+                  S = un commit con los cambios</div>
+    <pre><code>git switch main
+git merge --squash feature/carrito
+git commit -m "Agregar carrito de compras"</code></pre>
+  </details>
+  </div>
+</section>
+
+<section id="flujo">
+  <div class="section-head"><div><div class="eyebrow">Laboratorio guiado</div><h2>Ejercicio práctico completo</h2></div></div>
+  <div class="card">
+    <h3>Escenario: tienda online</h3>
+    <p>Vas a crear una rama para el carrito, guardar trabajo temporal, revisar diferencias y finalmente integrar la funcionalidad en <code>main</code>.</p>
+    <ol>
+      <li><strong>Crear el proyecto:</strong><pre><code>mkdir tienda-online
+cd tienda-online
+git init
+git branch -M main
+echo "# Tienda Online" > README.md
+git add .
+git commit -m "Inicializar proyecto"</code></pre></li>
+      <li><strong>Crear la rama:</strong><pre><code>git switch -c feature/carrito</code></pre></li>
+      <li><strong>Crear y confirmar un archivo:</strong><pre><code>echo "console.log('Mi carrito');" > carrito.js
+git add carrito.js
+git commit -m "Crear estructura del carrito"</code></pre></li>
+      <li><strong>Guardar temporalmente:</strong><pre><code>git stash push -u -m "Trabajo pendiente del carrito"
+git switch main</code></pre></li>
+      <li><strong>Volver y recuperar:</strong><pre><code>git switch feature/carrito
+git stash pop</code></pre></li>
+      <li><strong>Comparar e integrar:</strong><pre><code>git diff main..feature/carrito
+git switch main
+git merge feature/carrito</code></pre></li>
+    </ol>
+    <div class="callout">Ejecuta los pasos en una carpeta de práctica, no dentro de un proyecto importante. Los comandos <code>echo</code> del ejemplo están pensados para Git Bash o terminales compatibles.</div>
+  </div>
+</section>
+
+<section id="comandos">
+  <div class="section-head"><div><div class="eyebrow">Referencia rápida</div><h2>Listado de comandos GIT</h2></div><button class="btn" id="copyAll">Copiar todos los comandos</button></div>
+  <p class="muted">Filtra por palabra clave y copia los bloques para practicar. Los comandos que modifican o eliminan historial deben usarse con cuidado.</p>
+  <input class="search" id="commandSearch" placeholder="Buscar: stash, branch, revert, push...">
+  <div id="commandGroups">
+    <div class="card command-group" data-search="configuración init clone usuario"><h3>Configuración e inicialización</h3><div class="command-list">
+      <div class="command"><code>git config --global user.name "Tu Nombre"</code><small>Configurar nombre de autor.</small></div>
+      <div class="command"><code>git config --global user.email "correo@example.com"</code><small>Configurar correo de autor.</small></div>
+      <div class="command"><code>git config --global init.defaultBranch main</code><small>Usar main como rama inicial por defecto.</small></div>
+      <div class="command"><code>git init</code><small>Crear repositorio local.</small></div>
+      <div class="command"><code>git clone URL</code><small>Clonar repositorio remoto.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="estado add commit log show"><h3>Estado e historial</h3><div class="command-list">
+      <div class="command"><code>git status</code><small>Ver estado del repositorio.</small></div>
+      <div class="command"><code>git add .</code><small>Preparar cambios del directorio actual.</small></div>
+      <div class="command"><code>git add archivo.js</code><small>Preparar un archivo concreto.</small></div>
+      <div class="command"><code>git commit -m "Mensaje"</code><small>Crear commit.</small></div>
+      <div class="command"><code>git log --oneline</code><small>Historial compacto.</small></div>
+      <div class="command"><code>git log --oneline --graph --all</code><small>Historial gráfico de todas las ramas.</small></div>
+      <div class="command"><code>git show HASH</code><small>Inspeccionar un commit.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="branch switch ramas crear eliminar"><h3>Ramas</h3><div class="command-list">
+      <div class="command"><code>git branch</code><small>Listar ramas locales.</small></div>
+      <div class="command"><code>git branch -a</code><small>Listar locales y remotas.</small></div>
+      <div class="command"><code>git branch nombre</code><small>Crear una rama sin cambiar a ella.</small></div>
+      <div class="command"><code>git switch nombre</code><small>Cambiar de rama.</small></div>
+      <div class="command"><code>git switch -c nombre</code><small>Crear y cambiar de rama.</small></div>
+      <div class="command"><code>git branch -m nuevo-nombre</code><small>Renombrar rama actual.</small></div>
+      <div class="command"><code>git branch -d nombre</code><small>Eliminar rama integrada.</small></div>
+      <div class="command"><code>git branch -D nombre</code><small>Forzar eliminación local.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="diff comparar log ramas"><h3>Comparar ramas</h3><div class="command-list">
+      <div class="command"><code>git diff</code><small>Ver cambios no preparados.</small></div>
+      <div class="command"><code>git diff main..feature</code><small>Comparar contenido de ramas.</small></div>
+      <div class="command"><code>git diff --stat main..feature</code><small>Resumen de diferencias.</small></div>
+      <div class="command"><code>git log main..feature --oneline</code><small>Commits alcanzables desde feature y no desde main.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="stash guardar temporal recuperar"><h3>Stash</h3><div class="command-list">
+      <div class="command"><code>git stash</code><small>Guardar cambios rastreados temporalmente.</small></div>
+      <div class="command"><code>git stash push -u -m "Descripción"</code><small>Guardar también archivos no rastreados.</small></div>
+      <div class="command"><code>git stash list</code><small>Listar stash guardados.</small></div>
+      <div class="command"><code>git stash pop</code><small>Aplicar y eliminar entrada si aplica correctamente.</small></div>
+      <div class="command"><code>git stash apply</code><small>Aplicar y conservar entrada.</small></div>
+      <div class="command"><code>git stash drop stash@{0}</code><small>Eliminar una entrada.</small></div>
+      <div class="command"><code>git stash clear</code><small>Eliminar todos los stash.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="merge fast forward ff squash abort"><h3>Merge</h3><div class="command-list">
+      <div class="command"><code>git merge feature</code><small>Integrar rama.</small></div>
+      <div class="command"><code>git merge --ff-only feature</code><small>Permitir únicamente fast-forward.</small></div>
+      <div class="command"><code>git merge --no-ff feature</code><small>Forzar commit de merge.</small></div>
+      <div class="command"><code>git merge --squash feature</code><small>Preparar cambios como squash.</small></div>
+      <div class="command"><code>git merge --abort</code><small>Cancelar merge en curso.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="conflicto conflict add commit"><h3>Conflictos</h3><div class="command-list">
+      <div class="command"><code>git status</code><small>Identificar archivos en conflicto.</small></div>
+      <div class="command"><code>git diff</code><small>Inspeccionar diferencias.</small></div>
+      <div class="command"><code>git add archivo.js</code><small>Marcar archivo resuelto.</small></div>
+      <div class="command"><code>git commit</code><small>Finalizar merge cuando corresponda.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="revert reset deshacer commit"><h3>Revert y reset</h3><div class="command-list">
+      <div class="command"><code>git revert HASH</code><small>Crear commit inverso.</small></div>
+      <div class="command"><code>git revert --no-edit HASH</code><small>Revertir sin abrir editor.</small></div>
+      <div class="command"><code>git revert -m 1 HASH</code><small>Revertir merge indicando padre principal.</small></div>
+      <div class="command"><code>git reset --soft HEAD~1</code><small>Mover HEAD conservando cambios preparados.</small></div>
+      <div class="command"><code>git reset --mixed HEAD~1</code><small>Mover HEAD y dejar cambios sin preparar (predeterminado).</small></div>
+      <div class="command"><code>git reset --hard HEAD~1</code><small>Mover HEAD y descartar cambios; destructivo.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="restore show archivo otras ramas checkout"><h3>Archivos de otras ramas</h3><div class="command-list">
+      <div class="command"><code>git restore --source main -- archivo.js</code><small>Restaurar archivo desde main.</small></div>
+      <div class="command"><code>git show feature:archivo.js</code><small>Mostrar contenido de archivo en otra rama.</small></div>
+      <div class="command"><code>git checkout feature -- archivo.js</code><small>Alternativa clásica para extraer archivo.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="cherry pick commit continuar abort"><h3>Cherry-pick</h3><div class="command-list">
+      <div class="command"><code>git cherry-pick HASH</code><small>Aplicar commit seleccionado.</small></div>
+      <div class="command"><code>git cherry-pick HASH1 HASH2</code><small>Aplicar varios commits.</small></div>
+      <div class="command"><code>git cherry-pick --continue</code><small>Continuar después de resolver conflicto.</small></div>
+      <div class="command"><code>git cherry-pick --abort</code><small>Cancelar operación.</small></div>
+      <div class="command"><code>git cherry-pick --skip</code><small>Omitir el commit actual de la secuencia.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="rebase interactivo continue abort"><h3>Rebase</h3><div class="command-list">
+      <div class="command"><code>git rebase main</code><small>Reaplicar commits sobre main.</small></div>
+      <div class="command"><code>git rebase -i HEAD~3</code><small>Rebase interactivo de los últimos tres commits.</small></div>
+      <div class="command"><code>git rebase --continue</code><small>Continuar tras resolver conflictos.</small></div>
+      <div class="command"><code>git rebase --abort</code><small>Cancelar rebase.</small></div>
+      <div class="command"><code>git rebase --skip</code><small>Omitir commit actual.</small></div>
+    </div></div>
+    <div class="card command-group" data-search="remoto remote origin fetch pull push github"><h3>Repositorios remotos</h3><div class="command-list">
+      <div class="command"><code>git remote -v</code><small>Ver remotos configurados.</small></div>
+      <div class="command"><code>git remote add origin URL</code><small>Agregar remoto.</small></div>
+      <div class="command"><code>git fetch origin</code><small>Descargar referencias sin integrar en tu rama actual.</small></div>
+      <div class="command"><code>git pull origin main</code><small>Obtener e integrar cambios remotos.</small></div>
+      <div class="command"><code>git push origin main</code><small>Publicar rama main.</small></div>
+      <div class="command"><code>git push -u origin feature/login</code><small>Publicar rama y establecer upstream.</small></div>
+      <div class="command"><code>git push origin --delete feature/login</code><small>Eliminar rama remota.</small></div>
+      <div class="command"><code>git push --force-with-lease</code><small>Forzar actualización con comprobación de referencia remota.</small></div>
+    </div></div>
+  </div>
+</section>
+
+<section id="comparacion">
+  <div class="section-head"><div><div class="eyebrow">No confundir</div><h2>Diferencias importantes</h2></div></div>
+  <div class="card">
+  <table><thead><tr><th>Comandos</th><th>Diferencia principal</th></tr></thead><tbody>
+    <tr><td><code>merge</code> vs <code>rebase</code></td><td>Merge integra historias; rebase reaplica commits sobre otra base.</td></tr>
+    <tr><td><code>merge</code> vs <code>cherry-pick</code></td><td>Merge integra una rama; cherry-pick selecciona commits concretos.</td></tr>
+    <tr><td><code>merge</code> vs <code>merge --squash</code></td><td>Merge registra la integración; squash prepara el efecto de los cambios para un único commit nuevo.</td></tr>
+    <tr><td><code>revert</code> vs <code>reset</code></td><td>Revert crea un commit inverso; reset mueve la referencia de la rama.</td></tr>
+    <tr><td><code>stash</code> vs <code>commit</code></td><td>Stash guarda temporalmente; commit registra cambios en el historial.</td></tr>
+    <tr><td><code>restore</code> vs <code>switch</code></td><td>Restore recupera contenido de archivos; switch cambia de rama.</td></tr>
+    <tr><td><code>fetch</code> vs <code>pull</code></td><td>Fetch descarga referencias; pull descarga y luego integra cambios.</td></tr>
+  </tbody></table>
+  </div>
+</section>
+
+<section id="test">
+  <div class="section-head"><div><div class="eyebrow">Comprueba lo aprendido</div><h2>Test interactivo de Git</h2></div><span class="pill">10 preguntas</span></div>
+  <div class="card">
+    <p>Selecciona una respuesta por pregunta y pulsa <strong>Calificar test</strong>. Recibirás tu puntuación y una explicación de cada respuesta.</p>
+    <div class="progress"><span id="quizProgress"></span></div>
+    <p class="muted" id="answeredCount">0 de 10 respondidas</p>
+    <div id="quiz"></div>
+    <div class="toolbar"><button class="btn green" id="gradeQuiz">Calificar test</button><button class="btn secondary" id="resetQuiz">Reiniciar test</button></div>
+    <div id="quizResult" class="callout hidden" aria-live="polite"></div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">Guía de estudio de Git · Practica los comandos en un repositorio de prueba antes de aplicarlos a proyectos reales.</div></footer>
+<script>
+const $=s=>document.querySelector(s);
+document.querySelectorAll('pre').forEach(pre=>{const b=document.createElement('button');b.className='copy';b.textContent='Copiar';b.addEventListener('click',async()=>{const txt=pre.querySelector('code')?.innerText||pre.innerText.replace('Copiar','');try{await navigator.clipboard.writeText(txt);b.textContent='Copiado ✓'}catch(e){b.textContent='No disponible'}setTimeout(()=>b.textContent='Copiar',1400)});pre.appendChild(b)});
+$('#topicSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('.topic').forEach(d=>{d.classList.toggle('hidden',!((d.dataset.search+' '+d.innerText).toLowerCase().includes(q)))});});
+$('#expandAll').onclick=()=>document.querySelectorAll('.topic').forEach(d=>d.open=true);
+$('#collapseAll').onclick=()=>document.querySelectorAll('.topic').forEach(d=>d.open=false);
+$('#commandSearch').addEventListener('input',e=>{const q=e.target.value.toLowerCase();document.querySelectorAll('.command-group').forEach(g=>{const match=(g.dataset.search+' '+g.innerText).toLowerCase().includes(q);g.classList.toggle('hidden',!match)})});
+$('#copyAll').onclick=async()=>{const txt=[...document.querySelectorAll('.command code')].map(x=>x.innerText).join('\n');try{await navigator.clipboard.writeText(txt);$('#copyAll').textContent='Comandos copiados ✓'}catch(e){$('#copyAll').textContent='Copia no disponible'}setTimeout(()=>$('#copyAll').textContent='Copiar todos los comandos',1800)};
+const questions=[
+{q:'¿Qué comando crea una rama y cambia a ella inmediatamente?',a:['git branch feature/login','git switch -c feature/login','git merge feature/login'],c:1,e:'git switch -c crea la rama y te cambia a ella.'},
+{q:'Necesitas guardar temporalmente cambios sin crear un commit. ¿Qué utilizas?',a:['git stash','git revert','git cherry-pick'],c:0,e:'git stash guarda temporalmente cambios del directorio de trabajo y del índice.'},
+{q:'¿Qué hace git stash pop?',a:['Elimina todas las ramas','Aplica el stash y lo elimina de la lista si se aplica correctamente','Crea un commit'],c:1,e:'Pop aplica la entrada y después la elimina si la aplicación se completa correctamente.'},
+{q:'¿Cuándo puede ocurrir un fast-forward?',a:['Cuando las ramas han divergido','Cuando la rama destino puede avanzar directamente hasta la punta de la otra rama','Cuando hay siempre un conflicto'],c:1,e:'Fast-forward es posible si no hay commits divergentes en la rama destino.'},
+{q:'¿Qué utiliza un three-way merge?',a:['Tres repositorios remotos','La base común y las dos puntas de las ramas','Tres usuarios obligatoriamente'],c:1,e:'Git compara el ancestro común y las dos versiones finales.'},
+{q:'Dos ramas modificaron la misma línea y Git no puede decidir. ¿Qué ocurre?',a:['Un conflicto','Un stash automático','Un fast-forward'],c:0,e:'Debes resolver el conflicto, marcar los archivos y completar la operación.'},
+{q:'¿Qué comando deshace un commit creando otro commit inverso?',a:['git reset --hard','git revert','git branch -D'],c:1,e:'Revert mantiene el commit original en el historial y crea otro que invierte sus cambios.'},
+{q:'Necesitas aplicar un único commit de otra rama. ¿Qué comando usas?',a:['git cherry-pick HASH','git stash pop','git diff'],c:0,e:'Cherry-pick aplica los cambios de un commit concreto en la rama actual.'},
+{q:'¿Qué hace git rebase main desde una rama feature?',a:['Borra main','Reaplica los commits de feature sobre main','Fusiona siempre creando un merge commit'],c:1,e:'Rebase cambia la base y vuelve a aplicar los commits de la rama actual.'},
+{q:'Quieres reunir los cambios de una rama en un solo commit nuevo en main. ¿Qué opción es adecuada?',a:['git merge --squash feature','git branch -D feature','git fetch --all'],c:0,e:'Merge --squash prepara los cambios para que los confirmes en un solo commit.'}
+];
+let submitted=false;
+function renderQuiz(){const root=$('#quiz');root.innerHTML='';questions.forEach((q,i)=>{const d=document.createElement('div');d.className='quiz-q';d.innerHTML=`<strong>${i+1}. ${q.q}</strong><div>${q.a.map((a,j)=>`<label><input type="radio" name="q${i}" value="${j}"> ${a}</label>`).join('')}</div><div class="feedback hidden" id="fb${i}"></div>`;root.appendChild(d)});root.querySelectorAll('input').forEach(x=>x.addEventListener('change',updateProgress));updateProgress()}
+function updateProgress(){const n=questions.filter((q,i)=>document.querySelector(`input[name="q${i}"]:checked`)).length;$('#answeredCount').textContent=`${n} de ${questions.length} respondidas`;$(`#heroScore`).textContent=`${n} / ${questions.length}`;$('#quizProgress').style.width=(n/questions.length*100)+'%'}
+$('#gradeQuiz').onclick=()=>{let score=0;questions.forEach((q,i)=>{const selected=document.querySelector(`input[name="q${i}"]:checked`);const fb=$(`#fb${i}`);fb.classList.remove('hidden');if(selected&&Number(selected.value)===q.c){score++;fb.innerHTML='<span class="correct"><strong>Correcto.</strong></span> '+q.e}else{fb.innerHTML='<span class="incorrect"><strong>Respuesta correcta: '+q.a[q.c]+'.</strong></span> '+q.e}});const result=$('#quizResult');result.classList.remove('hidden');const pct=Math.round(score/questions.length*100);result.innerHTML=`<h3>Resultado: ${score} de ${questions.length} (${pct}%)</h3><p>${pct>=80?'¡Excelente! Tienes una buena comprensión de la gestión de ramas.':pct>=60?'Buen trabajo. Repasa las explicaciones de las preguntas que fallaste.':'Sigue practicando. Vuelve a revisar los temas y realiza el test otra vez.'}</p>`;result.scrollIntoView({behavior:'smooth',block:'center'});submitted=true};
+$('#resetQuiz').onclick=()=>{$('#quizResult').classList.add('hidden');renderQuiz();window.scrollTo({top:$('#test').offsetTop-65,behavior:'smooth'})};
+renderQuiz();
+</script>
+</body>
+</html>
